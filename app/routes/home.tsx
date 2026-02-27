@@ -1,13 +1,13 @@
-import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import type { RouteType } from "~/types/route";
+import { NavigationPanel } from "../components/NavigationPanel";
 
-export function meta({}: Route.MetaArgs) {
+export function meta({}: RouteType['MetaArgs']) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "codeTool首页" },
+    { name: "description", content: "Welcome to codeTool!" },
   ];
 }
 
 export default function Home() {
-  return <Welcome />;
+  return <NavigationPanel />;
 }

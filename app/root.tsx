@@ -1,75 +1,42 @@
-import {
-  isRouteErrorResponse,
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from "react-router";
+import { Outlet, Scripts, ScrollRestoration } from "react-router";
 
-import type { Route } from "./+types/root";
-import "./app.css";
+//  # 微信风格布局（左侧导航 + 右侧内容）
 
-export const links: Route.LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-  },
-];
-
-export function Layout({ children }: { children: React.ReactNode }) {
+export default function RootLayout() {
   return (
-    <html lang="en">
+    <html>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta />
-        <Links />
+        <title>codeTool</title>
       </head>
-      <body>
-        {children}
+      <body className="bg-gray-100">
+        <div className="flex">
+          {/* 左侧固定导航区域 */}
+          <div className="fixed left-0 top-0 w-64 h-full bg-white border-r border-gray-200 flex flex-col z-10">
+            {/* 顶部搜索/标题区域 */}
+            <div className="p-4 border-b border-gray-200">
+              <div className="text-lg font-semibold text-gray-800">codeTool</div>
+              <div className="text-xs text-gray-500 mt-1">代码生成工具平台</div>
+            </div>
+            
+            {/* 导航列表区域 */}
+            <div className="flex-1 overflow-y-auto">
+              <Outlet />
+            </div>
+          </div>
+          
+          {/* 右侧内容区域 - 需要留出左侧导航栏的空间 */}
+          <div className="flex-1 ml-64 flex flex-col bg-gray-50 min-h-screen">
+            {/* 内容区域占满剩余空间 */}
+            <div className="flex-1 overflow-hidden">
+              {/* 这里将显示具体的功能内容 */}
+            </div>
+          </div>
+        </div>
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
-  );
-}
-
-export default function App() {
-  return <Outlet />;
-}
-
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = "Oops!";
-  let details = "An unexpected error occurred.";
-  let stack: string | undefined;
-
-  if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error";
-    details =
-      error.status === 404
-        ? "The requested page could not be found."
-        : error.statusText || details;
-  } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message;
-    stack = error.stack;
-  }
-
-  return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
   );
 }
