@@ -5,6 +5,5 @@ export default [
     index("routes/home.tsx"),
     route("ekpcode", "routes/ekpcodeRoutes.tsx"),
     route("split","routes/splitRoutes.tsx"),
-    route("append","routes/appendRoutes.tsx")
-    
+    route("append","routes/appendRoutes.tsx") 
 ] satisfies RouteConfig;

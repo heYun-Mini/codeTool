@@ -1,30 +1,19 @@
-import { Button, Checkbox, Label, TextInput, Textarea, Alert } from "flowbite-react";
-import { useState } from "react";
-import { useRef } from 'react';
-import type { FormEvent } from "react";
-
+import { Button, Checkbox, Label, TextInput, Textarea } from "flowbite-react";
+import { useState, useMemo } from "react";
 export function SplitIndex() {
   // 1. 定义状态
-  const [result, setResult] = useState<string>("");
+  const [originalText, setOriginalText] = useState<string>("");
+  const [leftPad, setLeftPad] = useState<string>("");
+  const [rightPad, setRightPad] = useState<string>("");
+  const [delimiter, setDelimiter] = useState<string>("");
+  const [shouldTrim, setShouldTrim] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
-  const formRef = useRef<HTMLFormElement>(null); // 👈 创建 ref
   // 2. 处理提交函数
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // 阻止表单默认刷新行为
+  const result =useMemo(() => {
     setError("");
-    setResult("");
-
-    const formData = new FormData(e.currentTarget);
-    
-    // 获取表单数据
-    const originalText = formData.get("originalText") as string;
-    const leftPad = formData.get("leftPad") as string;
-    const rightPad = formData.get("rightPad") as string;
-    let delimiter = formData.get("delimiter") as string;
-    const shouldTrim = formData.get("trim") === "on"; // Checkbox 选中时为 "on"
     try {
       if(delimiter ===  '\\n'){
-        delimiter = '\n';
+        setDelimiter('\n');
       }
       let items = originalText.split(delimiter);
       
@@ -36,26 +25,28 @@ export function SplitIndex() {
         return `${leftPad || ''}${item}${rightPad || ''}`;
       });
       
-      setResult(processedItems.join('\n'));
+      return (processedItems.join('\n'));
       
     } catch (err) {
       setError("处理过程中出现错误");
     }
-  };
+  },[originalText, leftPad, rightPad,delimiter,shouldTrim]);
   // 一键清空所有表单字段
   const formReset = () =>{
-    formRef.current?.reset();
-    setResult("");
+    setOriginalText("")
+    setDelimiter("");
+    setLeftPad("");
+    setRightPad(""); 
+    setShouldTrim(true)
     setError("");
   }
   return (
       <div className="mx-auto">
         <div className="bg-white rounded-lg shadow-sm p-6">
+          <h5>按分隔符切割文本并批量添加前后缀</h5>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* 左侧：表单 */}
             <div>
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4" ref={formRef} >
-                
                 {/* 原始文本 */}
                 <div className="mb-4 w-full">
                   <div className="mb-2 block">
@@ -64,6 +55,8 @@ export function SplitIndex() {
                   <Textarea 
                     id="originalText" 
                     name="originalText" 
+                    value={originalText}
+                    onChange={(e)=>{setOriginalText(e.target.value)}}
                     rows={5}
                     className="w-full"
                     required 
@@ -78,6 +71,8 @@ export function SplitIndex() {
                   <TextInput 
                     id="leftPad" 
                     name="leftPad" 
+                    value={leftPad}
+                    onChange={(e)=>{setLeftPad(e.target.value)}}
                     type="text" 
                   />
                 </div>
@@ -89,7 +84,9 @@ export function SplitIndex() {
                   </div>
                   <TextInput 
                     id="rightPad" 
-                    name="rightPad" 
+                    name="rightPad"
+                    value={rightPad}
+                    onChange={(e)=>{setRightPad(e.target.value)}} 
                     type="text" 
                   />
                 </div>
@@ -97,11 +94,13 @@ export function SplitIndex() {
                 {/* 切割符 */}
                 <div>
                   <div className="mb-2 block">
-                    <Label htmlFor="delimiter">切割符</Label>
+                    <Label htmlFor="delimiter">切割符(用\n表示换行)</Label>
                   </div>
                   <TextInput 
                     id="delimiter" 
                     name="delimiter" 
+                    value={delimiter}
+                    onChange={(e)=>{setDelimiter(e.target.value)}}
                     type="text" 
                     required 
                   />
@@ -110,22 +109,18 @@ export function SplitIndex() {
                 {/* 选项：去除空格 */}
                 <div className="flex items-center gap-2">
                   <Checkbox 
-                    id="trim" 
-                    name="trim" 
-                    defaultChecked
+                    id="shouldTrim" 
+                    name="shouldTrim" 
+                    value={shouldTrim ? "on" : ""}
+                    onChange={(e)=>{setShouldTrim(e.target.checked)}}
                   />
                   <Label htmlFor="trim">去除首尾空格与换行符</Label>
                 </div>
                 <div className="flex gap-2">
-                  {/* 提交按钮 */}
-                  <Button type="submit" color="blue" className="mt-2">
-                    开始处理
-                  </Button>
                   <Button type="button" onClick={formReset} color="gray">
                     清空
                   </Button>
                 </div>
-              </form>
             </div>
 
             {/* 右侧：结果显示 */}
@@ -134,7 +129,7 @@ export function SplitIndex() {
                 <Label>处理结果</Label>
               </div>
       
-              <div className="mb-4 w-full">
+             <div className="mb-4 w-full">
                 <Textarea
                   readOnly
                   value={result}
@@ -142,13 +137,13 @@ export function SplitIndex() {
                   className="bg-gray-50 font-mono text-sm w-full"
                 />
                 {result && (
-                  <button
+                   <button
                     onClick={() => navigator.clipboard.writeText(result)}
                     className="absolute top-2 right-2 text-xs bg-white border border-gray-300 px-2 py-1 rounded hover:bg-gray-100"
                   >
                     复制
                   </button>
-                )}
+                  )}
               </div>
             </div>
           </div>

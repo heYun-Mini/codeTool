@@ -1,64 +1,62 @@
 import { Button, Label, TextInput, Textarea,Radio } from "flowbite-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRef } from 'react';
-import type { FormEvent } from "react";
-
 export function AppendIndex() {
   // 1. 定义状态
-  const [result, setResult] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const formRef = useRef<HTMLFormElement>(null); 
-  // 2. 处理提交函数
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // 阻止表单默认刷新行为
-    setError("");
-    setResult("");
 
-    const formData = new FormData(e.currentTarget);
-    
-    // 获取表单数据
-    // 左/上内容
-    const zsText = formData.get("zsText") as string;
-    // 左/上切割符
-    let zsDelimiter = formData.get("zsDelimiter") as string;
-    // 右/下内容
-    const yxText = formData.get("yxText") as string;
-    // 右/下切割符
-    let yxDelimiter = formData.get("yxDelimiter") as string;
-    // 拼接模式 左右(zy) 上下(sx)
-    const shouldTrim = formData.get("appendMode"); 
+  const [zsText, setZsText] = useState<string>("");
+  const [yxText, setYxText] = useState<string>("");
+  const [zsDelimiter, setZsDelimiter] = useState<string>("");
+  const [yxDelimiter, setYxDelimiter] = useState<string>("");
+  const [zsLeftPad, setZsLeftPad] = useState<string>("");
+  const [zsRightPad, setZsRightPad] = useState<string>("");
+  const [yxLeftPad, setYxLeftPad] = useState<string>("");
+  const [yxRightPad, setYxRightPad] = useState<string>("");
+  // 默认选择zy(左右拼接)
+  const [appendMode, setAppendMode] = useState<string>("zy");
+  const [error, setError] = useState<string>("");
+  // 2. 处理提交函数
+  const result = useMemo(() => {
+    setError("");
     try {
       if(zsDelimiter === '\\n'){
-        zsDelimiter = '\n';
+        setZsDelimiter('\n');
       }
       if(yxDelimiter === '\\n'){
-        yxDelimiter = '\n';
+        setYxDelimiter('\n');
       }
       const zsItems = zsText.split(zsDelimiter);
       const yxItems = yxText.split(yxDelimiter);
-      const processedItems = shouldTrim === "zy" ? 
-      zsItems.map((zsItem, index) => `${zsItem}${yxItems[index] || ''}`) 
-      : zsItems.map((zsItem, index) => `${zsItem}\n${yxItems[index] || ''}`);
-      setResult(processedItems.join('\n'));
+      // {左}{字符串}{右}
+      const processedItems = appendMode === "zy" ? 
+      zsItems.map((zsItem, index) => `${zsLeftPad || ''}${zsItem}${zsRightPad || ''}${yxLeftPad || ''}${yxItems[index] || ''}${yxRightPad || ''}`) 
+      : zsItems.map((zsItem, index) => `${zsLeftPad || ''}${zsItem}${zsRightPad || ''}\n${yxLeftPad || ''}${yxItems[index] || ''}${yxRightPad || ''}`);
+      return (processedItems.join('\n'));
       
     } catch (err) {
       setError("处理过程中出现错误");
     }
-  };
+  },[zsText, yxText, zsDelimiter, yxDelimiter, zsLeftPad, zsRightPad, yxLeftPad, yxRightPad, appendMode]);
   // 一键清空所有表单字段
   const formReset = () =>{
-    formRef.current?.reset();
-    setResult("");
+    setZsText("");
+    setYxText(""); 
+    setZsDelimiter("");
+    setYxDelimiter("");
+    setZsLeftPad("");
+    setZsRightPad("");
+    setYxLeftPad("");
+    setYxRightPad("");
+    setAppendMode("zy")
     setError("");
   }
   return (
       <div className="mx-auto">
         <div className="bg-white rounded-lg shadow-sm p-6">
+          <h5>将两段文本各自分割后，进行上下/左右拼接</h5>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* 左侧：表单 */}
             <div>
-              <form onSubmit={handleSubmit} className="flex flex-col gap-8" ref={formRef} >
-
                 <div className="mb-4 w-full">
                   <div className="mb-2 block">
                     <Label htmlFor="zsText">左/上 内容</Label>
@@ -67,6 +65,8 @@ export function AppendIndex() {
                     id="zsText" 
                     name="zsText" 
                     rows={5}
+                    value={zsText}
+                    onChange={(e) => setZsText(e.target.value)}
                     className="w-full"
                     required 
                   />
@@ -74,13 +74,40 @@ export function AppendIndex() {
               
                 <div>
                   <div className="mb-2 block">
-                    <Label htmlFor="delimiter">切割符</Label>
+                    <Label htmlFor="delimiter">切割符(用\n表示换行)</Label>
                   </div>
                   <TextInput 
                     id="zsDelimiter" 
                     name="zsDelimiter" 
                     type="text" 
+                    value={zsDelimiter}
+                    onChange={(e) => setZsDelimiter(e.target.value)}
                     required 
+                  />
+                </div>
+                <div>
+                  <div className="mb-2 block">
+                    <Label htmlFor="zsLeftPad">左填充内容</Label>
+                  </div>
+                  <TextInput 
+                    id="zsLeftPad" 
+                    name="zsLeftPad" 
+                    type="text" 
+                    value={zsLeftPad}
+                    onChange={(e) => setZsLeftPad(e.target.value)}
+                  />
+                </div>
+                {/* 右填充 */}
+                <div>
+                  <div className="mb-2 block">
+                    <Label htmlFor="zsRightPad">右填充内容</Label>
+                  </div>
+                  <TextInput 
+                    id="zsRightPad" 
+                    name="zsRightPad" 
+                    type="text" 
+                    value={zsRightPad}
+                    onChange={(e) => setZsRightPad(e.target.value)}
                   />
                 </div>
                 <div className="mb-4 w-full">
@@ -93,40 +120,67 @@ export function AppendIndex() {
                     rows={5}
                     className="w-full"
                     required 
+                    value={yxText}
+                    onChange={(e) => setYxText(e.target.value)}
                   />
                 </div>
               
                 <div>
                   <div className="mb-2 block">
-                    <Label htmlFor="yxDelimiter">切割符</Label>
+                    <Label htmlFor="yxDelimiter">切割符(用\n表示换行)</Label>
                   </div>
                   <TextInput 
                     id="yxDelimiter" 
                     name="yxDelimiter" 
                     type="text" 
                     required 
+                    value={yxDelimiter}
+                    onChange={(e) => setYxDelimiter(e.target.value)}
                   />
                 </div>
-               <div className="flex max-w-md flex-col gap-4">
-            <div className="flex items-center gap-2">
-                <Radio id="united-state" name="appendMode" value="zy" defaultChecked />
-                <Label htmlFor="united-state">左右拼接</Label>
-            </div>
-            <div className="flex items-center gap-2">
-                <Radio id="germany" name="appendMode" value="sx" />
-                <Label htmlFor="germany">上下拼接</Label>
-            </div>
-            </div>
+                <div>
+                  <div className="mb-2 block">
+                    <Label htmlFor="yxLeftPad">左填充内容</Label>
+                  </div>
+                  <TextInput 
+                    id="yxLeftPad" 
+                    name="yxLeftPad" 
+                    type="text" 
+                    value={yxLeftPad}
+                    onChange={(e) => setYxLeftPad(e.target.value)}
+                  />
+                </div>
+
+                {/* 右填充 */}
+                <div>
+                  <div className="mb-2 block">
+                    <Label htmlFor="yxRightPad">右填充内容</Label>
+                  </div>
+                  <TextInput 
+                    id="yxRightPad" 
+                    name="yxRightPad" 
+                    value={yxRightPad}
+                    onChange={(e) => setYxRightPad(e.target.value)} 
+                    type="text" 
+                  />
+                </div>
+                <div className="flex max-w-md flex-col gap-4">
+                  <div className="flex items-center gap-2">
+                      <Radio id="united-state" name="appendMode" value="zy" 
+                      checked={appendMode === "zy"} onChange={(e) => setAppendMode(e.target.value)}  />
+                      <Label htmlFor="united-state">左右拼接</Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                      <Radio id="germany" name="appendMode" value="sx"
+                      checked={appendMode === "sx"} onChange={(e) => setAppendMode(e.target.value)}  />
+                      <Label htmlFor="germany">上下拼接</Label>
+                  </div>
+                </div>
                 <div className="flex gap-2">
-                  {/* 提交按钮 */}
-                  <Button type="submit" color="blue" className="mt-2">
-                    开始处理
-                  </Button>
                   <Button type="button" onClick={formReset} color="gray">
                     清空
                   </Button>
                 </div>
-              </form>
             </div>
 
             {/* 右侧：结果显示 */}

@@ -9,7 +9,7 @@ export interface NavItem {
 export const navigation: NavItem[] = [
   { title: "首页", href: "/" },
   { title: "ekp代码生成", href: "/ekpcode" },
-  { title: "文本切割处理", href: "/split" },
+  { title: "Split & Wrap", href: "/split" },
   { title: "文本拼接", href: "/append" },
   
   // 后续新增菜单只需在这里添加
