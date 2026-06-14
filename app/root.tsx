@@ -10,7 +10,8 @@ interface NavItem {
 const navigation: NavItem[] = [
   { href: "/ekpcode", title: "EKP 代码生成" },
   { href: "/split", title: "文本分割与填充" },
-  { href: "/append", title: "文本拼接Pro" }
+  { href: "/append", title: "文本拼接Pro" },
+  { href: "/mkReact", title: "生成 React 代码" },
 ];
 
 function NavigationItem({ item }: { item: NavItem }) {
