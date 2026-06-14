@@ -1,6 +1,6 @@
 import React from "react";
-import { ContentArea } from "../components/ContentArea";
-import { VersionRadio } from "./versionRadio";
+import { ContentArea } from "~/components/ContentArea";
+import { VersionRadio } from "~/components/ekpcode/versionRadio";
 import {useState, useMemo} from "react";
 import { Button, Label, TextInput, Textarea,Radio } from "flowbite-react";
 import { EKPCodeUtils } from "~/lib/EKPCodeUtils";

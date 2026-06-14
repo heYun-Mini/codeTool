@@ -1,5 +1,5 @@
 import type { RouteType } from "~/types/route";
-import { Index } from "../ekpcode/ekpcodeIndex";
+import { Index } from "../pages/ekpcode/ekpcodeIndex";
 
 export function meta({}: RouteType['MetaArgs']) {
   return [
