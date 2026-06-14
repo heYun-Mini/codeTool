@@ -41,8 +41,8 @@ export function AppendIndex() {
   const formReset = () =>{
     setZsText("");
     setYxText(""); 
-    setZsDelimiter("");
-    setYxDelimiter("");
+    setZsDelimiter("\n");
+    setYxDelimiter("\n");
     setZsLeftPad("");
     setZsRightPad("");
     setYxLeftPad("");

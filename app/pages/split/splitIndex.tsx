@@ -1,7 +1,9 @@
 import { Button, Checkbox, Label, TextInput, Textarea } from "flowbite-react";
 import { useState, useMemo } from "react";
+import { TextareaWithCopy } from "~/components/TextareaWithCopy";
+
 export function SplitIndex() {
-  // 1. 定义状态
+  //  // 1. 定义状态
   const [originalText, setOriginalText] = useState<string>("");
   const [leftPad, setLeftPad] = useState<string>("");
   const [rightPad, setRightPad] = useState<string>("");
@@ -9,8 +11,8 @@ export function SplitIndex() {
   const [shouldTrim, setShouldTrim] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   // 2. 处理提交函数
-  const result =useMemo(() => {
-    setError("");
+  const result =useMemo<string>(() => {
+    setError(""); 
     try {
       if(delimiter ===  '\\n'){
         setDelimiter('\n');
@@ -29,6 +31,7 @@ export function SplitIndex() {
       
     } catch (err) {
       setError("处理过程中出现错误");
+      return "";
     }
   },[originalText, leftPad, rightPad,delimiter,shouldTrim]);
   // 一键清空所有表单字段
@@ -45,7 +48,7 @@ export function SplitIndex() {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h5>按分隔符切割文本并批量添加前后缀</h5>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* 左侧：表单 */}
+            {/* 左侧：表�?*/}
             <div>
                 {/* 原始文本 */}
                 <div className="mb-4 w-full">
@@ -123,31 +126,16 @@ export function SplitIndex() {
                 </div>
             </div>
 
-            {/* 右侧：结果显示 */}
+            {/* 右侧：结果显示?*/}
             <div className="flex flex-col h-full">
               <div className="mb-2 block">
                 <Label>处理结果</Label>
               </div>
-      
-             <div className="mb-4 w-full">
-                <Textarea
-                  readOnly
-                  value={result}
-                  rows={12}
-                  className="bg-gray-50 font-mono text-sm w-full"
-                />
-                {result && (
-                   <button
-                    onClick={() => navigator.clipboard.writeText(result)}
-                    className="absolute top-2 right-2 text-xs bg-white border border-gray-300 px-2 py-1 rounded hover:bg-gray-100"
-                  >
-                    复制
-                  </button>
-                  )}
-              </div>
+              <TextareaWithCopy result={result} rows={12} />
             </div>
           </div>
         </div>
       </div>
   );
 }
+
